@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"github.com/kkmhh/practice-go-gin/src/service"
-	gindump "github.com/tpkeeper/gin-dump"
 )
 
 var (
@@ -32,7 +31,7 @@ func main() {
 		gin.Recovery(),
 		middlewares.Logger(),
 		middlewares.BasicAuth(),
-		gindump.Dump(),
+		//gindump.Dump(),
 	)
 
 	server.GET("/videos", func(ctx *gin.Context) {
@@ -40,7 +39,12 @@ func main() {
 	})
 
 	server.POST("/videos", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, videoController.Save(ctx))
+		err := videoController.Save(ctx)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else {
+			ctx.JSON(http.StatusOK, gin.H{"message": "Video Valid."})
+		}
 	})
 
 	server.Run(":8080")
